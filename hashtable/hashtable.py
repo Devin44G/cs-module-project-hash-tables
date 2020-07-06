@@ -60,9 +60,9 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         hash = 5381
-        for x in key:
-            hash = ((hash << 5) + hash) + ord(x)
-        return hash & 0xFFFFFFFF
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
     def hash_index(self, key):
         """
@@ -80,7 +80,17 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        self.load += 1
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        if node is None:
+            self.buckets[i] = HashTableEntry(key, value)
+            return
+        prev = node
+        while node is not None:
+            prev = node
+            node = node.next
+        prev.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -90,7 +100,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        pass
 
     def get(self, key):
         """
@@ -100,7 +110,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        while node is not None and node.key != key:
+            node = node.next
+        if node is None:
+            return None
+        else:
+            return node.value
 
     def resize(self, new_capacity):
         """
