@@ -168,8 +168,13 @@ class HashTable:
 
         Implement this.
         """
-        self.capacity = new_capacity
-
+        new_arr = [None] * new_capacity
+        self.capacity = new_arr
+        for item in self.buckets:
+            for space in new_arr:
+                if space is None:
+                    space = item
+        self.buckets = new_arr
 
 
 if __name__ == "__main__":
@@ -189,6 +194,7 @@ if __name__ == "__main__":
     ht.put("line_12", "And stood awhile in thought.")
 
     print("")
+    print(ht.get_load_factor())
 
     # Test storing beyond capacity
     for i in range(1, 13):
@@ -202,7 +208,7 @@ if __name__ == "__main__":
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
     print("")
