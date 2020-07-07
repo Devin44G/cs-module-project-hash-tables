@@ -43,7 +43,8 @@ class HashTable:
 
         Implement this.
         """
-        return self.load / self.capacity
+        load_factor = self.load / self.capacity
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -80,17 +81,32 @@ class HashTable:
 
         Implement this.
         """
+        # self.load += 1
+        # i = self.hash_index(key)
+        # node = self.buckets[i]
+        # if node is None:
+        #     self.buckets[i] = HashTableEntry(key, value)
+        #     return
+        # prev = node
+        # while node is not None:
+        #     prev = node
+        #     node = node.next
+        # prev.next = HashTableEntry(key, value)
+
         self.load += 1
         i = self.hash_index(key)
         node = self.buckets[i]
-        if node is None:
+        if node:
+            prev = None
+            while node:
+                if node.key == key:
+                    node.value = value
+                    return
+                prev = node
+                node = node.next
+            prev.next = HashTableEntry(key, value)
+        else:
             self.buckets[i] = HashTableEntry(key, value)
-            return
-        prev = node
-        while node is not None:
-            prev = node
-            node = node.next
-        prev.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -100,7 +116,33 @@ class HashTable:
 
         Implement this.
         """
-        pass
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        while node.key != key:
+            node = node.next
+        if node is None:
+            return None
+        else:
+            self.load -= 1
+            node.value = None
+            result = node.value
+            return result
+
+        # self.load -= 1
+        # i = self.hash_index(key)
+        # node = self.buckets[i]
+        # if node:
+        #     prev = None
+        #     while node:
+        #         if node.key == key:
+        #             if prev:
+        #                 prev.next = node.next
+        #             else:
+        #                 self.buckets[i] = node.next
+        #         prev = node
+        #         node = node.next
+        # else:
+        #     return None
 
     def get(self, key):
         """
@@ -126,7 +168,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        self.capacity = new_capacity
+
 
 
 if __name__ == "__main__":
