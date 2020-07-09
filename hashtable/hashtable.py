@@ -168,13 +168,25 @@ class HashTable:
 
         Implement this.
         """
-        new_arr = [None] * new_capacity
-        self.capacity = new_arr
-        for item in self.buckets:
-            for space in new_arr:
-                if space is None:
-                    space = item
-        self.buckets = new_arr
+        if new_capacity > 8:
+            self.capacity = new_capacity
+        else:
+            self.capacity = 8
+        old_array = self.buckets
+        self.buckets = [None] * self.capacity
+        old_size = self.load
+
+        current_node = None
+
+        for entry in old_array:
+            current_node = entry
+            while current_node is not None:
+                self.put(current_node.key, current_node.value)
+                current_node = current_node.next
+        self.load = old_size
+        # for item in self.buckets:
+        #     print(f'This is the key! {item.key}')
+        #     print(f'This is the value! {item.value}')
 
 
 if __name__ == "__main__":

@@ -1,6 +1,18 @@
-def word_count(s):
-    # Your code here
+import string
 
+
+def word_count(s):
+    for c in string.punctuation:
+        s = s.replace(c, '')
+    dict = {}
+    s = s.lower()
+    words = s.split()
+    # print(words)
+    for word in words:
+        if word not in dict:
+            dict[word] = 0
+        dict[word] += 1
+    return dict
 
 
 if __name__ == "__main__":
