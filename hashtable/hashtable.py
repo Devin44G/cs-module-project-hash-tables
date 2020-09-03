@@ -20,9 +20,10 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
-        # Your code here
-
+    def __init__(self, capacity=MIN_CAPACITY):
+        self.capacity = capacity
+        self.load = 0
+        self.buckets = [None] * self.capacity
 
     def get_num_slots(self):
         """
@@ -34,8 +35,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        return len(self.buckets)
 
     def get_load_factor(self):
         """
@@ -43,8 +43,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        load_factor = self.load / self.capacity
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -52,9 +52,7 @@ class HashTable:
 
         Implement this, and/or DJB2.
         """
-
-        # Your code here
-
+        pass
 
     def djb2(self, key):
         """
@@ -62,15 +60,17 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
-
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -81,8 +81,32 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # self.load += 1
+        # i = self.hash_index(key)
+        # node = self.buckets[i]
+        # if node is None:
+        #     self.buckets[i] = HashTableEntry(key, value)
+        #     return
+        # prev = node
+        # while node is not None:
+        #     prev = node
+        #     node = node.next
+        # prev.next = HashTableEntry(key, value)
 
+        self.load += 1
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        if node:
+            prev = None
+            while node:
+                if node.key == key:
+                    node.value = value
+                    return
+                prev = node
+                node = node.next
+            prev.next = HashTableEntry(key, value)
+        else:
+            self.buckets[i] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -92,8 +116,33 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        while node.key != key:
+            node = node.next
+        if node is None:
+            return None
+        else:
+            self.load -= 1
+            node.value = None
+            result = node.value
+            return result
 
+        # self.load -= 1
+        # i = self.hash_index(key)
+        # node = self.buckets[i]
+        # if node:
+        #     prev = None
+        #     while node:
+        #         if node.key == key:
+        #             if prev:
+        #                 prev.next = node.next
+        #             else:
+        #                 self.buckets[i] = node.next
+        #         prev = node
+        #         node = node.next
+        # else:
+        #     return None
 
     def get(self, key):
         """
@@ -103,8 +152,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+        i = self.hash_index(key)
+        node = self.buckets[i]
+        while node is not None and node.key != key:
+            node = node.next
+        if node is None:
+            return None
+        else:
+            return node.value
 
     def resize(self, new_capacity):
         """
@@ -113,8 +168,25 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        if new_capacity > 8:
+            self.capacity = new_capacity
+        else:
+            self.capacity = 8
+        old_array = self.buckets
+        self.buckets = [None] * self.capacity
+        old_size = self.load
 
+        current_node = None
+
+        for entry in old_array:
+            current_node = entry
+            while current_node is not None:
+                self.put(current_node.key, current_node.value)
+                current_node = current_node.next
+        self.load = old_size
+        # for item in self.buckets:
+        #     print(f'This is the key! {item.key}')
+        #     print(f'This is the value! {item.value}')
 
 
 if __name__ == "__main__":
@@ -134,6 +206,7 @@ if __name__ == "__main__":
     ht.put("line_12", "And stood awhile in thought.")
 
     print("")
+    print(ht.get_load_factor())
 
     # Test storing beyond capacity
     for i in range(1, 13):
@@ -147,7 +220,7 @@ if __name__ == "__main__":
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
     print("")
